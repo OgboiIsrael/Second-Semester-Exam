@@ -1,0 +1,28 @@
+---
+
+- host: all
+  become: yes
+  pre_tasks:
+
+  - name: Execute server update and upgrade
+    apt:
+	update_cache: yes
+	upgrade: yes
+
+  - name: Run cron job commands to check server uptime every 12am
+    cron:
+	name: "Check Uptime"
+        job: "0 0 * * * /usr/bin/uptime > /var/log/uptime.log 2>&1"
+	state: present
+
+  - name: Copy and set permission on LAMP Laravel script to Slave
+    copy:
+	src: LAMP+Laravel.sh
+	dest: ~/
+	owner: root
+	group: root
+	mode: 0755
+
+  - name: Execute Script
+    command: bash LAMP+Laravel.sh < /dev/null
+
